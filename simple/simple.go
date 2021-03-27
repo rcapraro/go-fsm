@@ -68,5 +68,5 @@ func main() {
 	sw := NewSwitch()
 	sw.On()
 	sw.Off()
-	sw.Off()
+	sw.Off() //Current State is OffState, so Off() delegates to BaseState Off() method
 }
