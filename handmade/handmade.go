@@ -67,7 +67,7 @@ func (t Trigger) String() string {
 	}
 }
 
-// Defines the reltion between a Trigger and the resulting State
+// Defines the relation between a Trigger and the resulting State
 type TriggerResult struct {
 	Trigger Trigger
 	State   State
