@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-// First try"implementation of the GoF State pattern
+// First try: simple implementation of the GoF State pattern
 // see https://en.wikipedia.org/wiki/State_pattern
 
 type Switch struct {
@@ -13,7 +13,7 @@ func (s *Switch) On() {
 	s.State.On(s)
 }
 
-func (s * Switch) Off() {
+func (s *Switch) Off() {
 	s.State.Off(s)
 }
 
@@ -26,7 +26,7 @@ type State interface {
 	Off(sw *Switch)
 }
 
-type BaseState struct {}
+type BaseState struct{}
 
 func (b *BaseState) On(sw *Switch) {
 	fmt.Println("Light already turned on !")
