@@ -1,4 +1,4 @@
-package main
+package gof
 
 import "fmt"
 

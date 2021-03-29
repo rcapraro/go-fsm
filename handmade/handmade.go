@@ -1,4 +1,4 @@
-package main
+package handmade
 
 import (
 	"bufio"
@@ -36,11 +36,11 @@ func (s State) String() string {
 	}
 }
 
-// A Trigger defines a transition from a State to Another
-type Trigger int
+// A, Event defines a transition from a State to Another
+type Event int
 
 const (
-	CallDialed Trigger = iota
+	CallDialed Event = iota
 	HungUp
 	CallConnected
 	PlacedOnHold
@@ -48,7 +48,7 @@ const (
 	LeftMessage
 )
 
-func (t Trigger) String() string {
+func (t Event) String() string {
 	switch t {
 	case CallDialed:
 		return "CallDialed"
@@ -67,16 +67,16 @@ func (t Trigger) String() string {
 	}
 }
 
-// Defines the relation between a Trigger and the resulting State
-type TriggerResult struct {
-	Trigger Trigger
-	State   State
+// Defines the relation between an Event and the resulting State
+type EventResult struct {
+	Event Event
+	State State
 }
 
 // For any given State,
 // it might be possible to transition to more than one State,
-// depending on the Trigger
-var rules = map[State][]TriggerResult{
+// depending on the Event
+var rules = map[State][]EventResult{
 	OffHook: {
 		{CallDialed, Connecting},
 	},
@@ -99,11 +99,11 @@ func main() {
 	state, exitState := OffHook, OnHook
 	for ok := true; ok; ok = state != exitState {
 		fmt.Println("The phone is currently", state)
-		fmt.Println("Select a trigger:")
+		fmt.Println("Select an event:")
 
 		for i := 0; i < len(rules[state]); i++ {
 			tr := rules[state][i]
-			fmt.Println(strconv.Itoa(i), ".", tr.Trigger)
+			fmt.Println(strconv.Itoa(i), ".", tr.Event)
 		}
 
 		input, _, _ := bufio.NewReader(os.Stdin).ReadLine()
