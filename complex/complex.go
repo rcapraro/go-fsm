@@ -2,26 +2,21 @@ package complex
 
 import (
 	"errors"
-	"fmt"
 )
 
 var UnhandledEvent = errors.New("unhandled event")
 
+const (
+	Default StateType = 0
+)
+
+const (
+	NoOp EventType = 0
+)
+
 type StateType int
 
-const (
-	Default StateType = iota
-	Off
-	On
-)
-
 type EventType int
-
-const (
-	NoOp EventType = iota
-	SwitchOn
-	SwitchOff
-)
 
 // Action to be executed on a given State, can return another EventType
 type Action interface {
@@ -83,44 +78,6 @@ func (s *StateMachine) SendEvent(event EventType, ctx EventContext) error {
 			return nil
 		}
 		event = nextEvent
-	}
-}
-
-type OnAction struct{}
-
-func (o OnAction) Execute(ctx EventContext) EventType {
-	fmt.Println("Light turned on")
-	return NoOp
-}
-
-type OffAction struct{}
-
-func (o OffAction) Execute(ctx EventContext) EventType {
-	fmt.Println("Light turned off")
-	return NoOp
-}
-
-func NewLightSwitchFSM() *StateMachine {
-	return &StateMachine{
-		States: States{
-			Default: State{
-				Events: Events{
-					SwitchOff: Off,
-				},
-			},
-			Off: State{
-				Action: &OffAction{},
-				Events: Events{
-					SwitchOn: On,
-				},
-			},
-			On: State{
-				Action: &OnAction{},
-				Events: Events{
-					SwitchOff: Off,
-				},
-			},
-		},
 	}
 }
 
