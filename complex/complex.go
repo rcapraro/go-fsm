@@ -2,6 +2,7 @@ package complex
 
 import (
 	"errors"
+	"fmt"
 )
 
 var UnhandledEvent = errors.New("unhandled event")
@@ -64,8 +65,8 @@ func (s *StateMachine) SendEvent(event EventType, ctx EventContext) error {
 		}
 
 		state, ok := s.States[nextState]
-		if !ok || state.Action == nil {
-			// configuration error
+		if !ok || state.Action == nil || state.Events == nil {
+			return fmt.Errorf("FSM configuration: Check the presence of the actions or the event in the state %v\n",nextState)
 		}
 
 		// Transition over to the next state.
