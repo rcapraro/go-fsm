@@ -1,11 +1,8 @@
 package complex
 
 import (
-	"errors"
 	"fmt"
 )
-
-var UnhandledEvent = errors.New("unhandled event")
 
 const (
 	Default StateType = 0
@@ -54,19 +51,23 @@ func (s *StateMachine) getNextState(event EventType) (StateType, error) {
 			}
 		}
 	}
-	return Default, UnhandledEvent
+	return Default, fmt.Errorf("unhandled event %v for state %v\n", event, s.Current)
 }
 
 func (s *StateMachine) SendEvent(event EventType, ctx EventContext) error {
 	for {
 		nextState, err := s.getNextState(event)
 		if err != nil {
-			return UnhandledEvent
+			return err
 		}
 
 		state, ok := s.States[nextState]
-		if !ok || state.Action == nil || state.Events == nil {
-			return fmt.Errorf("FSM configuration: Check the presence of the actions or the event in the state %v\n",nextState)
+		if !ok {
+			return fmt.Errorf("no State for %v\n",nextState)
+		} else if  state.Action == nil {
+			return fmt.Errorf("no Action for %v\n",nextState)
+		} else if state.Events == nil {
+			return fmt.Errorf("no Events for %v\n",nextState)
 		}
 
 		// Transition over to the next state.

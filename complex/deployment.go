@@ -7,16 +7,16 @@ import (
 const desiredReplicas = 2
 
 const (
-	CreatingDeployment StateType = iota +1
-	RequeuingDeployment
-	RetryingDeployment
-	RunningDeployment
-	StoppedDeployment
-	FailedDeployment
+	Creating StateType = iota +1
+	Requeuing
+	Retrying
+	Running
+	Stopped
+	Failed
 )
 
 func (s StateType) String() string {
-	return [...]string{"DEFAULT", "CREATING", "REQUEUING", "RETRYING", "RUNNING", "STOPPED", "FAILED"}[s]
+	return [...]string{"Default", "Creating", "Requeuing", "retrying", "Running", "Stopped", "Failed"}[s]
 }
 
 const (
@@ -27,6 +27,10 @@ const (
 	StopDeployment
 	FailDeployment
 )
+
+func (s EventType) String() string {
+	return [...]string{"No Operation", "Create", "Requeue", "Retry", "Run", "Stop", "Fail"}[s]
+}
 
 type DeploymentCreationContext struct {
 	NbReplicas int
@@ -55,39 +59,53 @@ func (r RequeueDeploymentAction) Execute(ctx EventContext) EventType {
 	return NoOp
 }
 
+type RunDeploymentAction struct {}
+
+func (r RunDeploymentAction) Execute(ctx EventContext) EventType {
+	fmt.Println("Deployment is running, updating its status...")
+	return NoOp
+}
+
 func NewDeploymentFSM() *StateMachine {
 	return &StateMachine{
 		Current:  0,
 		States:   States{
 			Default: State{
 				Events: Events {
-					CreateDeployment: CreatingDeployment,
+					CreateDeployment: Creating,
 				},
 			},
-			CreatingDeployment: State{
+			Creating: State{
 				Action: &CreationDeploymentAction{},
 				Events: Events{
-					RequeueDeployment: RequeuingDeployment,
-					RunDeployment:   RunningDeployment,
-					RetryDeployment: RetryingDeployment,
+					RequeueDeployment: Requeuing,
+					RunDeployment:     Running,
+					RetryDeployment:   Retrying,
 				},
 			},
-			RequeuingDeployment: State{
+			Requeuing: State{
 				Action: &RequeueDeploymentAction{},
 				Events: Events {
-					RetryDeployment: RetryingDeployment,
-					RunDeployment: RunningDeployment,
+					CreateDeployment: Creating,
+					RetryDeployment:  Retrying,
+					RunDeployment:    Running,
 				},
 			},
-			RetryingDeployment: State{
+			Retrying: State{
 				Events: Events{
-					FailDeployment: FailedDeployment,
-					RunDeployment:  RunningDeployment,
+					FailDeployment: Failed,
+					RunDeployment:  Running,
 				},
 			},
-			StoppedDeployment: State{
+			Running: State {
+				Action: &RunDeploymentAction{},
 				Events: Events{
-					StopDeployment: StoppedDeployment,
+
+				},
+			},
+			Stopped: State{
+				Events: Events{
+					StopDeployment: Stopped,
 				},
 			},
 		},
