@@ -10,4 +10,4 @@ Based on triggers and rules (a rule is map whose key is a State and values are a
 Based on Go switch statement
 
 ## Complex FSM
-This version allows the execution of events with a context (ie a struct containing some data to passe to the next State)
+This version allows the execution of events with a context (ie a struct containing some data to pass to the next State)
